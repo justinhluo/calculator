@@ -6,8 +6,10 @@ let secondDecimal = false;
 let operated = false;
 const display = document.querySelector(".input");
 const history = document.querySelector(".pastInput");
-
+const screen =  document.querySelector(".screen");
 function operate(num1, num2, sign) {
+  let result;
+
   if(firstNum[firstNum.length-1] == '.') firstNum = firstNum.slice(0,-1);
   if(secondNum[secondNum.length-1] == '.') secondNum = secondNum.slice(0,-1);
   history.textContent = `${firstNum} ${signEntered} ${secondNum}`;
@@ -17,22 +19,31 @@ function operate(num1, num2, sign) {
   
   if(sign == '+') {
     
-    firstNum = (a.plus(b)).toString();
+    result = (a.plus(b));
   }
   if(sign == '-') {
   
-    firstNum =  (a.minus(b)).toString();
+    result =  (a.minus(b));
   }
   if(sign == '/') {
   
-    firstNum =  (a.div(b)).toString();
+    result =  (a.div(b));
   }
   if(sign == '*') {
   
-    firstNum =  (a.times(b)).toString();
+    result =  (a.times(b));
   }
  
+  firstNum = result.toString();
+  
   display.textContent = firstNum;
+
+  if (display.scrollWidth > 390) {
+    console.log('element overflows');
+    display.textContent = result.toExponential(8).toString();
+    firstNum = result.toExponential(8).toString();
+  }
+
   if(!firstNum.includes('.')) firstDecimal = false;
 
 }
@@ -93,33 +104,45 @@ function output(input){
       }
     
     }else if(input == '+' || input == '-' ||input == '/' ||input == '*') {
+      
       if(operated) {
         signEntered = "";
         secondNum = "";
         secondDecimal = false;
         operated = false;
       }
-      if(firstNum == "" && input == '-') { //can add negative to first number
-        display.textContent = display.textContent + '-'
-        firstNum += '-';           
-      }  
-      else if(display.textContent[display.textContent.length-1] == " ") { //if last input is sign, change sign instead of adding another sign
+
+      if(firstNum == "") {
+        if(input == '-') {
+          display.textContent = display.textContent + '-'
+          firstNum += '-';
+        }
+        return;
+      }
+
+      if(firstNum == '-') return;
+       
+      if(display.textContent[display.textContent.length-1] == " ") { //if last input is sign, change sign instead of adding another sign
         signEntered = input;
         display.textContent = display.textContent.slice(0, -3) + ` ${input} `;
+        return;
       }
-      else if (signEntered == "") { //if sign hasn't been entered in equation add sign 
+      if (signEntered == "" && firstNum != "-" && firstNum != "") { //if sign hasn't been entered in equation add sign 
         display.textContent = display.textContent + ` ${input} `;
         signEntered = input;
-      }else { //if sign is already in equation call operate and append new sign to result
-        operate(firstNum, secondNum, signEntered);
-        operated = false;
-        secondNum = "";
-        secondDecimal = false;
-        signEntered = input;
-        display.textContent = display.textContent + ` ${input} `;
-
-      }
+        console.log("hi");
+        return;
+      } //if sign is already in equation call operate and append new sign to result
+      
+      operate(firstNum, secondNum, signEntered);
+      operated = false;
+      secondNum = "";
+      secondDecimal = false;
+      signEntered = input;
+      display.textContent = display.textContent + ` ${input} `;
+ 
     }
+  
       
     else if(input == '=' || input == 'Enter') {
 
@@ -135,7 +158,7 @@ function output(input){
       } 
       if(signEntered == "" && !firstDecimal){
         firstDecimal = true;
-        if(firstNum == "" || firstNum[0] == '-' && firstNum.length == 1) {
+        if(firstNum == "" || (firstNum[0] == '-' && firstNum.length == 1)) {
           firstNum += '0.';
           display.textContent = display.textContent + '0.';
         }else {
@@ -144,7 +167,7 @@ function output(input){
         }
       }else if(signEntered != "" && !secondDecimal) {
         secondDecimal = true;
-        if(secondNum == "" || secondNum[0] == '-' && secondNum.length == 1) {
+        if(secondNum == "" || (secondNum[0] == '-' && secondNum.length == 1)) {
           secondNum += '0.';
           display.textContent = display.textContent + '0.';
         }else{
@@ -158,12 +181,12 @@ function output(input){
         clear();
       } 
       if(signEntered == "") {
-        if((firstNum[0] == '0' && firstNum[1] != '.') || (firstNum[0] == '-' && firstNum[1] == '0')) {
+        if((firstNum[0] == '0' && firstNum.length == 1) || (firstNum[0] == '-' && firstNum[1] == '0' && firstNum.length == 2)) {
           firstNum = firstNum.slice(0,-1);
           display.textContent = display.textContent.slice(0,-1);
         }
       }else if(signEntered != "") {
-        if((secondNum[0] == '0' && secondNum[1] != '.') || (secondNum[0] == '-' && secondNum[1] == '0')) {
+        if((secondNum[0] == '0' && secondNum.length == 1) || (secondNum[0] == '-' && secondNum[1] == '0' && secondNum.length == 2)) {
           secondNum = secondNum.slice(0,-1);
           display.textContent = display.textContent.slice(0,-1);  
         }       
