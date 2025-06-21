@@ -16,7 +16,7 @@ function operate(num1, num2, sign) {
   const a = new Decimal(parseFloat(num1));
   const b = new Decimal(parseFloat(num2));
 
-  if(Math.abs(b) >= 1e+6 || Math.abs(b) <= 1e-6) {
+  if(Math.abs(b) >= 1e+6 || 0 < Math.abs(b) && Math.abs(b) <= 1e-6) {
     history.textContent = `${firstNum} ${signEntered} ${b.toExponential(6)}`;
   }
   else if(secondNum.length >= 8) {
@@ -51,7 +51,7 @@ function operate(num1, num2, sign) {
   
   display.textContent = firstNum;
   
-  if(Math.abs(result) >= 1e+6 || Math.abs(result) <= 1e-6) {
+  if(Math.abs(result) >= 1e+6 || 0 < Math.abs(result) && Math.abs(result) <= 1e-6) {
 
     display.textContent = result.toExponential(6).toString();
     firstNum = result.toExponential(6).toString();
