@@ -7,66 +7,61 @@ let operated = false;
 const display = document.querySelector(".input");
 const history = document.querySelector(".pastInput");
 const screen =  document.querySelector(".screen");
-function operate(num1, num2, sign) {
+
+function formatNum(num) { 
+
+  num = parseFloat(num);
+
+  if(Math.abs(num) !=0 && (Math.abs(num) >= 1e+8 || Math.abs(num) <= 1e-8)) {
+
+    return num.toExponential(8).toString().replace(/\.?0+e/, 'e');
+  }
+  else if (num > 0 && num.toString().length >= 9 || num < 0 && num.toString().length >= 10) {
+
+      return (num.toPrecision(8)).toString().replace(/(\.\d*?[1-9])0+$/g, '$1').replace(/\.0+$/g, '');
+  }
+
+   else {
+      return num.toString();
+   }
+}
+
+
+function operate() {
   let result;
 
   if(firstNum[firstNum.length-1] == '.') firstNum = firstNum.slice(0,-1);
   if(secondNum[secondNum.length-1] == '.') secondNum = secondNum.slice(0,-1);
-  
-  const a = new Decimal(parseFloat(num1));
-  const b = new Decimal(parseFloat(num2));
 
-  if(Math.abs(b) >= 1e+6 || 0 < Math.abs(b) && Math.abs(b) <= 1e-6) {
-    history.textContent = `${firstNum} ${signEntered} ${b.toExponential(6)}`;
-  }
-  else if(secondNum.length >= 8) {
-    secondNum = secondNum.slice(0,8);
-    if(secondNum[secondNum.length-1] == '.') {
-        secondNum = secondNum.slice(0,-1);
-    }
-    history.textContent = `${firstNum} ${signEntered} ${secondNum.slice(0,8)}`
-  }else{
-    history.textContent = `${firstNum} ${signEntered} ${secondNum}`
-  }
+  firstNum = formatNum(firstNum);
+  secondNum = formatNum(secondNum);
+  
+  const a = new Decimal(parseFloat(firstNum));
+  const b = new Decimal(parseFloat(secondNum));
+
+
+  history.textContent = `${firstNum} ${signEntered} ${secondNum}`
   
   
-  if(sign == '+') {
+  if(signEntered == '+') {
     
     result = (a.plus(b));
   }
-  if(sign == '-') {
+  if(signEntered == '-') {
   
     result =  (a.minus(b));
   }
-  if(sign == '/') {
+  if(signEntered == '/') {
   
     result =  (a.div(b));
   }
-  if(sign == '*') {
+  if(signEntered == '*') {
   
     result =  (a.times(b));
   }
- 
-  firstNum = result.toString();
   
+  firstNum = formatNum(result.toString()); 
   display.textContent = firstNum;
-  
-  if(Math.abs(result) >= 1e+6 || 0 < Math.abs(result) && Math.abs(result) <= 1e-6) {
-
-    display.textContent = result.toExponential(6).toString();
-    firstNum = result.toExponential(6).toString();
-    return;
-  }
-  if (display.scrollWidth > 390 || display.textContent.length >= 8) {
-
-      display.textContent = display.textContent.slice(0,8);
-      if(display.textContent[display.textContent.length-1] == '.') {
-        display.textContent = display.textContent.slice(0,-1);
-      }
-      firstNum = display.textContent;
-      return;
-    }
-
   if(!firstNum.includes('.')) firstDecimal = false;
 
 }
@@ -156,7 +151,7 @@ function output(input){
         return;
       } //if sign is already in equation call operate and append new sign to result
       
-      operate(firstNum, secondNum, signEntered);
+      operate();
       operated = false;
       secondNum = "";
       secondDecimal = false;
@@ -170,7 +165,7 @@ function output(input){
 
       if(firstNum == "" || secondNum == "") return; //make sure firstnum and secondnum are valid or else do nothing
 
-      operate(firstNum, secondNum, signEntered);
+      operate();
       operated = true;
 
     }
